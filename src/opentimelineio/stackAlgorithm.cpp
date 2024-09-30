@@ -272,7 +272,7 @@ flatten_stack(std::vector<Track*> const& tracks, ErrorStatus* error_status)
         flat_tracks.push_back(track);
     }
 
-    _merge_invisible_items(tracks)
+    _merge_invisible_items(flat_tracks)
     _normalize_tracks_lengths(flat_tracks, tracks_retainer, error_status);
     if (is_error(error_status))
     {
