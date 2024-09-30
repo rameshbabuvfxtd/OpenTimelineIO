@@ -13,6 +13,40 @@ typedef std::map<Track*, std::map<Composable*, TimeRange>> RangeTrackMap;
 typedef std::vector<SerializableObject::Retainer<Track>>   TrackRetainerVector;
 
 static void
+_merge_invisible_items(
+    std::vector<Track*>& tracks)
+{
+    for (auto track : tracks)
+    {
+        unsigned long index = 1;
+        while (index < track->children().size())
+        {
+
+            auto current_item = track->children()[index];
+            auto current_item1 = dynamic_retainer_cast<Item>(current_item);
+            auto previous_item = track->children()[index - 1];
+            auto previous_item1 = dynamic_retainer_cast<Item>(previous_item);
+
+            if (!current_item->visible() && !previous_item->visible())
+             {
+                auto prev_source_range = previous_item1->trimmed_range();
+                auto cur_duration = current_item1->duration();
+                previous_item1->set_source_range(
+                    prev_source_range.duration_extended_by(cur_duration)
+                );
+
+                track->remove_child(index, nullptr);
+            }
+            else
+            {
+                ++index;
+            }
+        }
+
+    }
+}
+
+static void
 _flatten_next_item(
     RangeTrackMap&             range_track_map,
     Track*                     flat_track,
